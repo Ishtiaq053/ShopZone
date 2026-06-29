@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> — ShopZone</title>
+</head>
+<body>
+
+<%- include('../partials/navbar') %>
+
+<div class="page-wrap">
+  <div class="container section">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" style="margin-bottom:32px">
+      <a href="/">Home</a><span class="breadcrumb-sep">/</span>
+      <a href="/products">Products</a><span class="breadcrumb-sep">/</span>
+      <a href="/products?category=<%= encodeURIComponent(product.category) %>"><%= product.category %></a>
+      <span class="breadcrumb-sep">/</span>
+      <span><%= product.name.slice(0,40) %><%= product.name.length>40?'…':'' %></span>
+    </div>
+
+    <!-- ── Main Layout ─────────────────────────────────────── -->
+    <div class="product-detail-layout">
+
+      <!-- Left: Image -->
+      <div class="product-image-section animate-fade-in">
+        <div class="product-main-image">
+          <% if (product.image) { %>
+            <img src="<%= product.image %>" alt="<%= product.name %>">
+          <% } else { %>
+            <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--color-gray-400);font-size:1rem;background:var(--color-gray-50)">
+              <%
+                const iconMap={Electronics:'💻',Clothing:'👗',Books:'📚','Home & Kitchen':'🏠',Sports:'⚽',Beauty:'💄',Toys:'🧸',Automotive:'🚗'};
+              %>
+              <span style="font-size:5rem"><%= iconMap[product.category]||'📦' %></span>
+              <span>No image available</span>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Trust row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">
+          <% [['🚚','Free Shipping'],['↩','Easy Returns'],['🔒','Secure Pay']].forEach(f=>{ %>
+          <div style="text-align:center;padding:14px 8px;background:var(--color-gray-50);border-radius:var(--border-radius);border:1px solid var(--color-gray-200)">
+            <div style="font-size:1.4rem"><%= f[0] %></div>
+            <div style="font-size:.72rem;font-weight:600;color:var(--color-gray-600);margin-top:4px"><%= f[1] %></div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Right: Info -->
+      <div class="product-info-section animate-fade-in-up">
+
+        <div class="product-detail-category">
+          <%= product.category %>
+          <% if (product.featured) { %>
+            <span class="badge badge-featured" style="font-size:.65rem">⭐ Featured</span>
+          <% } %>
+        </div>
+
+        <h1 class="product-detail-name"><%= product.name %></h1>
+
+        <div class="product-detail-meta">
+          <% if (product.brand) { %>
+            <span class="product-detail-brand">by <strong><%= product.brand %></strong></span>
+          <% } %>
+          <div class="product-detail-rating">
+            <span class="stars" style="font-size:1rem;color:var(--color-gold)">
+              <%= '★'.repeat(Math.round(product.rating||4)) %><%= '☆'.repeat(5-Math.round(product.rating||4)) %>
+            </span>
+            <span style="font-size:.85rem;color:var(--color-gray-500)">(<%= product.rating||4 %>/5)</span>
+          </div>
+          <% if (product.sku) { %><span style="font-size:.8rem;color:var(--color-gray-400)">SKU: <%= product.sku %></span><% } %>
+        </div>
+
+        <!-- Price box -->
+        <div class="product-detail-price-box">
+          <% const hasDiscount = product.isOnSale && product.discountPercent > 0;
+             const salePrice   = hasDiscount ? Math.round(product.price*(1-product.discountPercent/100)) : product.price;
+             const savedAmount = product.price - salePrice;
+          %>
+          <span class="product-detail-price-current">PKR <%= salePrice.toLocaleString() %></span>
+          <% if (hasDiscount) { %>
+            <span class="product-detail-price-original">PKR <%= product.price.toLocaleString() %></span>
+            <span class="product-detail-price-save">Save PKR <%= savedAmount.toLocaleString() %> (<%= product.discountPercent %>% OFF)</span>
+          <% } %>
+        </div>
+
+        <!-- Description -->
+        <% if (product.description) { %>
+        <p class="product-detail-description"><%= product.description %></p>
+        <% } %>
+
+        <!-- Stock -->
+        <div class="product-detail-stock">
+          <% if (product.stock === 0) { %>
+            <span class="stock-dot out"></span>
+            <span style="color:var(--color-gray-500)">Out of Stock</span>
+          <% } else if (product.stock < 5) { %>
+            <span class="stock-dot low"></span>
+            <span style="color:#b5850a">Only <%= product.stock %> left — Order soon!</span>
+          <% } else { %>
+            <span class="stock-dot in"></span>
+            <span style="color:var(--color-success)">In Stock (<%= product.stock %> available)</span>
+          <% } %>
+        </div>
+
+        <!-- Qty selector + Actions -->
+        <% if (product.stock > 0) { %>
+        <div style="margin-bottom:20px">
+          <label style="font-size:.85rem;font-weight:600;color:var(--color-gray-600);display:block;margin-bottom:8px">Quantity</label>
+          <div class="qty-selector">
+            <button class="qty-btn" onclick="changeQty(-1)" type="button">−</button>
+            <input class="qty-value" id="qtyInput" type="number" value="1" min="1" max="<%= product.stock %>" readonly>
+            <button class="qty-btn" onclick="changeQty(1)" type="button">+</button>
+          </div>
+        </div>
+
+        <div class="product-detail-actions">
+          <button class="btn btn-primary btn-lg" id="addToCartBtn"
+            data-add-to-cart
+            data-id="<%= product._id %>"
+            data-name="<%= product.name %>"
+            data-price="<%= salePrice %>"
+            data-image="<%= product.image||'' %>"
+            data-brand="<%= product.brand||'' %>"
+            data-category="<%= product.category %>">
+            🛒 Add to Cart
+          </button>
+          <a href="/cart" class="btn btn-secondary btn-lg">View Cart</a>
+        </div>
+        <% } else { %>
+          <div class="btn btn-light btn-lg" style="cursor:not-allowed;opacity:.6;text-align:center">Out of Stock</div>
+        <% } %>
+
+        <!-- Features -->
+        <div class="product-features" style="margin-top:24px">
+          <div class="product-feature"><span class="icon">✓</span> Genuine Product Guaranteed</div>
+          <div class="product-feature"><span class="icon">✓</span> 7-Day Easy Returns</div>
+          <div class="product-feature"><span class="icon">✓</span> Free Shipping on PKR 5,000+</div>
+          <div class="product-feature"><span class="icon">✓</span> Secure Checkout</div>
+        </div>
+
+      </div><!-- /product-info-section -->
+    </div><!-- /product-detail-layout -->
+
+    <!-- ── Related Products ────────────────────────────────── -->
+    <% if (related && related.length > 0) { %>
+    <div style="margin-top:64px">
+      <div class="section-header-row">
+        <div>
+          <span class="section-eyebrow">More Like This</span>
+          <h2 class="section-title" style="margin-bottom:0">Related Products</h2>
+        </div>
+        <a href="/products?category=<%= encodeURIComponent(product.category) %>" class="btn btn-secondary btn-sm">View All</a>
+      </div>
+
+      <div class="product-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+        <% related.forEach((rp, idx) => {
+             const rDisc = rp.isOnSale && rp.discountPercent > 0;
+             const rPrice = rDisc ? Math.round(rp.price*(1-rp.discountPercent/100)) : rp.price;
+        %>
+        <div class="product-card animate-fade-in-up stagger-<%= idx+1 %>">
+          <div class="product-card-image">
+            <% if (rp.image) { %>
+              <img src="<%= rp.image %>" alt="<%= rp.name %>" loading="lazy">
+            <% } else { %>
+              <div class="product-card-image-placeholder">
+                <span class="icon">📦</span>
+              </div>
+            <% } %>
+            <div class="card-badges">
+              <% if (rDisc) { %><span class="badge badge-sale">-<%= rp.discountPercent %>%</span><% } %>
+            </div>
+            <div class="card-actions-overlay">
+              <a href="/products/<%= rp._id %>" class="card-quick-btn">👁 View</a>
+              <% if (rp.stock > 0) { %>
+              <button class="card-quick-btn primary" data-add-to-cart
+                data-id="<%= rp._id %>" data-name="<%= rp.name %>"
+                data-price="<%= rPrice %>" data-image="<%= rp.image||'' %>"
+                data-brand="<%= rp.brand||'' %>" data-category="<%= rp.category %>">
+                🛒 Add
+              </button>
+              <% } %>
+            </div>
+          </div>
+          <div class="product-card-body">
+            <span class="product-card-category"><%= rp.category %></span>
+            <a href="/products/<%= rp._id %>" style="text-decoration:none">
+              <div class="product-card-name"><%= rp.name %></div>
+            </a>
+            <div class="product-card-price">
+              <span class="price-current">PKR <%= rPrice.toLocaleString() %></span>
+              <% if (rDisc) { %><span class="price-original">PKR <%= rp.price.toLocaleString() %></span><% } %>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+
+  </div><!-- /container -->
+</div><!-- /page-wrap -->
+
+<%- include('../partials/footer') %>
+<button class="scroll-top" aria-label="Back to top">↑</button>
+<script src="/js/cart.js"></script>
+<script>
+  const maxStock = <%= product.stock %>;
+  function changeQty(delta) {
+    const inp = document.getElementById('qtyInput');
+    const btn = document.getElementById('addToCartBtn');
+    let v = parseInt(inp.value) + delta;
+    v = Math.max(1, Math.min(maxStock, v));
+    inp.value = v;
+    // update qty on the add-to-cart button so cart.js picks it up
+    // (cart.js always adds 1; here we add qty times)
+  }
+
+  // Override add to cart to respect qty selector
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('addToCartBtn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopImmediatePropagation();
+        const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+        const product = {
+          id:       btn.dataset.id,
+          name:     btn.dataset.name,
+          price:    Number(btn.dataset.price),
+          image:    btn.dataset.image || '',
+          brand:    btn.dataset.brand || '',
+          category: btn.dataset.category || ''
+        };
+        for (let i=0; i<qty; i++) addToCart(product);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓ Added to Cart!';
+        btn.style.background = '#2a9d8f';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 1500);
+      }, true);
+    }
+  });
+</script>
+</body>
+</html>

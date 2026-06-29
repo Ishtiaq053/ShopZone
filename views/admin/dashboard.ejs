@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — ShopZone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/flash') %>
+<script src="/js/main.js"></script>
+
+<div class="admin-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <%- include('../partials/adminSidebar', { activePage: 'dashboard' }) %>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-topbar-title">
+        Dashboard <span>/ Overview</span>
+      </div>
+      <div class="admin-topbar-right">
+        <a href="/products" class="btn btn-light btn-sm">🌐 View Store</a>
+        <div class="admin-user-pill">
+          <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
+          <%= currentUser.name.split(' ')[0] %>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- Stats grid -->
+      <div class="admin-stats-grid">
+        <div class="stat-card products">
+          <div class="stat-card-icon">📦</div>
+          <div class="stat-card-value"><%= totalProducts %></div>
+          <div class="stat-card-label">Total Products</div>
+          <span class="stat-card-change up"><%= inStockProducts %> in stock</span>
+        </div>
+        <div class="stat-card users">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-card-value"><%= totalUsers %></div>
+          <div class="stat-card-label">Registered Users</div>
+        </div>
+        <div class="stat-card orders">
+          <div class="stat-card-icon">🛒</div>
+          <div class="stat-card-value"><%= totalOrders %></div>
+          <div class="stat-card-label">Total Orders</div>
+        </div>
+        <div class="stat-card revenue">
+          <div class="stat-card-icon">⭐</div>
+          <div class="stat-card-value"><%= featuredProducts %></div>
+          <div class="stat-card-label">Featured Products</div>
+          <span class="stat-card-change up"><%= outOfStockProducts %> out of stock</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+        <!-- Recent Products -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Recent Products</div>
+            <a href="/admin/products" class="btn btn-light btn-sm">View All</a>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentProducts.forEach(p => {
+                   const sp = p.isOnSale && p.discountPercent > 0
+                     ? Math.round(p.price*(1-p.discountPercent/100)) : p.price;
+              %>
+              <tr>
+                <td>
+                  <div class="product-thumb-cell">
+                    <% if (p.image) { %>
+                      <img src="<%= p.image %>" class="product-thumb" alt="">
+                    <% } else { %>
+                      <div class="product-thumb-placeholder">📦</div>
+                    <% } %>
+                    <div>
+                      <div class="table-product-name" style="font-size:.82rem"><%= p.name.slice(0,28) %><%= p.name.length>28?'…':'' %></div>
+                      <div class="table-product-brand"><%= p.brand||'' %></div>
+                    </div>
+                  </div>
+                </td>
+                <td style="font-size:.8rem"><%= p.category %></td>
+                <td style="font-size:.82rem;font-weight:600">PKR <%= sp.toLocaleString() %></td>
+                <td>
+                  <% if (p.stock===0) { %>
+                    <span class="stock-pill-out">Out</span>
+                  <% } else if (p.stock<5) { %>
+                    <span class="stock-pill-low"><%= p.stock %> left</span>
+                  <% } else { %>
+                    <span class="stock-pill-in"><%= p.stock %></span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Recent Orders</div>
+            <a href="/admin/orders" class="btn btn-light btn-sm">View All</a>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentOrders && recentOrders.length) { %>
+                <% recentOrders.forEach(o => { %>
+                <tr>
+                  <td>
+                    <div style="font-size:.82rem;font-weight:600"><%= o.user ? o.user.name : 'Unknown' %></div>
+                    <div style="font-size:.75rem;color:var(--color-gray-400)"><%= o.user ? o.user.email : '' %></div>
+                  </td>
+                  <td style="font-size:.82rem;font-weight:700">PKR <%= o.totalAmount.toLocaleString() %></td>
+                  <td><span class="status-pill status-<%= o.status %>"><%= o.status %></span></td>
+                  <td style="font-size:.75rem;color:var(--color-gray-500)"><%= new Date(o.createdAt).toLocaleDateString('en-PK') %></td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="4" style="text-align:center;color:var(--color-gray-400);padding:24px">No orders yet</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /grid -->
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-layout -->
+</body>
+</html>

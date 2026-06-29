@@ -1,0 +1,42 @@
+<aside class="admin-sidebar">
+  <div class="admin-sidebar-logo">
+    <div class="icon-box">S</div>
+    <span>Shop<span>Zone</span></span>
+  </div>
+
+  <nav class="admin-nav">
+    <div class="admin-nav-group-label">Main</div>
+
+    <a href="/admin" class="admin-nav-item <%= activePage==='dashboard'?'active':'' %>">
+      <span class="icon">📊</span> Dashboard
+    </a>
+
+    <div class="admin-nav-group-label">Catalogue</div>
+
+    <a href="/admin/products" class="admin-nav-item <%= activePage==='products'?'active':'' %>">
+      <span class="icon">📦</span> Products
+    </a>
+    <a href="/admin/products/add" class="admin-nav-item <%= activePage==='add'?'active':'' %>">
+      <span class="icon">➕</span> Add Product
+    </a>
+
+    <div class="admin-nav-group-label">Sales</div>
+
+    <a href="/admin/orders" class="admin-nav-item <%= activePage==='orders'?'active':'' %>">
+      <span class="icon">🛒</span> Orders
+    </a>
+
+    <div class="admin-nav-group-label">Store</div>
+
+    <a href="/products" class="admin-nav-item" target="_blank">
+      <span class="icon">🌐</span> View Store
+    </a>
+    <a href="/logout" class="admin-nav-item" style="color:rgba(255,100,100,.7)">
+      <span class="icon">↩</span> Logout
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    ShopZone Admin v1.0
+  </div>
+</aside>

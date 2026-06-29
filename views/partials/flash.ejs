@@ -1,0 +1,24 @@
+<% const _success = (typeof success !== 'undefined' && success && success.length) ? success : [];
+   const _error   = (typeof error   !== 'undefined' && error   && error.length)   ? error   : [];
+   const _warning = (typeof warning !== 'undefined' && warning && warning.length) ? warning : [];
+   const _info    = (typeof info    !== 'undefined' && info    && info.length)    ? info    : [];
+   const _all = [
+     ..._success.map(m=>({type:'success',msg:m,icon:'✓'})),
+     ..._error.map(m=>({type:'error',msg:m,icon:'✕'})),
+     ..._warning.map(m=>({type:'warning',msg:m,icon:'⚠'})),
+     ..._info.map(m=>({type:'info',msg:m,icon:'ℹ'}))
+   ];
+%>
+<% if (_all.length) { %>
+<div class="flash-container">
+  <% _all.forEach(f => { %>
+  <div class="flash-message flash-<%= f.type %>">
+    <span class="flash-icon"><%= f.icon %></span>
+    <div class="flash-content">
+      <div class="flash-text"><%= f.msg %></div>
+    </div>
+    <button class="flash-close" type="button">✕</button>
+  </div>
+  <% }) %>
+</div>
+<% } %>

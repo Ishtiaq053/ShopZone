@@ -1,0 +1,76 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand col -->
+      <div class="footer-brand">
+        <div class="brand-name">Shop<span>Zone</span></div>
+        <p class="footer-brand-text">
+          Your premium destination for quality products across every category.
+          Fast shipping, easy returns, and unbeatable prices.
+        </p>
+        <div class="footer-social">
+          <a href="#" class="social-link" aria-label="Facebook">f</a>
+          <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
+          <a href="#" class="social-link" aria-label="Instagram">◎</a>
+          <a href="#" class="social-link" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+
+      <!-- Shop links -->
+      <div>
+        <div class="footer-col-title">Shop</div>
+        <div class="footer-links">
+          <a href="/products" class="footer-link">All Products</a>
+          <a href="/products?category=Electronics" class="footer-link">Electronics</a>
+          <a href="/products?category=Clothing" class="footer-link">Clothing</a>
+          <a href="/products?category=Books" class="footer-link">Books</a>
+          <a href="/products?category=Sports" class="footer-link">Sports</a>
+          <a href="/products?category=Beauty" class="footer-link">Beauty</a>
+        </div>
+      </div>
+
+      <!-- Account links -->
+      <div>
+        <div class="footer-col-title">Account</div>
+        <div class="footer-links">
+          <% if (currentUser) { %>
+            <a href="/cart"   class="footer-link">My Cart</a>
+            <a href="/logout" class="footer-link">Logout</a>
+            <% if (currentUser.role === 'admin') { %>
+              <a href="/admin" class="footer-link">Admin Panel</a>
+            <% } %>
+          <% } else { %>
+            <a href="/login"    class="footer-link">Login</a>
+            <a href="/register" class="footer-link">Register</a>
+            <a href="/cart"     class="footer-link">Cart</a>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Support links -->
+      <div>
+        <div class="footer-col-title">Support</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">About Us</a>
+          <a href="#" class="footer-link">Contact</a>
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">FAQ</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; <%= new Date().getFullYear() %> ShopZone. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a href="#" class="footer-bottom-link">Privacy</a>
+        <a href="#" class="footer-bottom-link">Terms</a>
+        <a href="#" class="footer-bottom-link">Cookies</a>
+      </div>
+      <div style="color:rgba(255,255,255,.35);font-size:.78rem">
+        💳 Visa &nbsp;·&nbsp; Mastercard &nbsp;·&nbsp; JazzCash &nbsp;·&nbsp; EasyPaisa
+      </div>
+    </div>
+  </div>
+</footer>

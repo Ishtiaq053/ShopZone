@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product — ShopZone Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/flash') %>
+<script src="/js/main.js"></script>
+
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar', { activePage: 'products' }) %>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="admin-topbar-title">Products <span>/ Edit Product</span></div>
+      <div class="admin-topbar-right">
+        <a href="/admin/products" class="btn btn-light btn-sm">← Back to Products</a>
+        <div class="admin-user-pill">
+          <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
+          <%= currentUser.name.split(' ')[0] %>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <form action="/admin/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+        <div class="admin-form-card">
+          <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--color-gray-200)">
+            Edit: <%= product.name.slice(0,48) %>
+          </h2>
+
+          <div class="admin-form-grid">
+            <!-- Name -->
+            <div class="admin-form-full">
+              <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <input type="text" name="name" class="form-control-admin <%= errors.name?'is-invalid':'' %>"
+                       value="<%= old.name!==undefined ? old.name : product.name %>" required>
+                <% if (errors.name) { %><div class="form-error">⚠ <%= errors.name %></div><% } %>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select name="category" class="form-control-admin" required>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat %>"
+                    <%= (old.category!==undefined ? old.category : product.category) === cat ? 'selected' : '' %>>
+                    <%= cat %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Brand</label>
+              <input type="text" name="brand" class="form-control-admin"
+                     value="<%= old.brand!==undefined ? old.brand : (product.brand||'') %>">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Price (PKR) *</label>
+              <input type="number" name="price" class="form-control-admin <%= errors.price?'is-invalid':'' %>"
+                     min="0" value="<%= old.price!==undefined ? old.price : product.price %>" required>
+              <% if (errors.price) { %><div class="form-error">⚠ <%= errors.price %></div><% } %>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Stock Quantity *</label>
+              <input type="number" name="stock" class="form-control-admin <%= errors.stock?'is-invalid':'' %>"
+                     min="0" value="<%= old.stock!==undefined ? old.stock : product.stock %>" required>
+              <% if (errors.stock) { %><div class="form-error">⚠ <%= errors.stock %></div><% } %>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Rating (1–5)</label>
+              <input type="number" name="rating" class="form-control-admin"
+                     min="1" max="5" step="0.1" value="<%= product.rating||4 %>">
+            </div>
+
+            <div class="admin-form-full">
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control-admin" rows="4"><%= old.description!==undefined ? old.description : (product.description||'') %></textarea>
+              </div>
+            </div>
+
+            <!-- Current image + upload -->
+            <div class="admin-form-full">
+              <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <% if (product.image) { %>
+                  <div style="margin-bottom:12px;display:flex;align-items:center;gap:14px">
+                    <img src="<%= product.image %>" alt="Current" style="width:80px;height:80px;object-fit:cover;border-radius:var(--border-radius);border:1px solid var(--color-gray-200)">
+                    <span style="font-size:.82rem;color:var(--color-gray-500)">Current image — upload below to replace</span>
+                  </div>
+                <% } %>
+                <div class="image-upload-area">
+                  <input type="file" name="image" accept="image/jpeg,image/png,image/webp" onchange="previewImage(this)">
+                  <div class="image-upload-icon">📷</div>
+                  <div class="image-upload-text"><%= product.image ? 'Upload new image to replace current' : 'Click to upload image' %></div>
+                  <div class="image-upload-hint">JPG, PNG, WebP — Max 5MB</div>
+                </div>
+                <div id="imgPreview" class="image-preview" style="display:none">
+                  <img id="previewImg" src="" alt="New preview">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Featured Product</label>
+              <div class="form-toggle-group">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="featured" value="true" <%= product.featured?'checked':'' %>>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Show in Featured section</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">On Sale</label>
+              <div class="form-toggle-group">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="isOnSale" value="true" id="onSaleToggle"
+                         <%= product.isOnSale?'checked':'' %> onchange="toggleDiscount(this)">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Mark as on sale</span>
+              </div>
+            </div>
+
+            <div class="form-group" id="discountGroup" style="<%= product.isOnSale?'':'display:none' %>">
+              <label class="form-label">Discount Percentage (%)</label>
+              <input type="number" name="discountPercent" class="form-control-admin"
+                     min="1" max="99" value="<%= product.discountPercent||'' %>">
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--color-gray-200)">
+            <button type="submit" class="btn btn-primary">✓ Save Changes</button>
+            <a href="/admin/products" class="btn btn-light">Cancel</a>
+            <form action="/admin/products/delete/<%= product._id %>" method="POST" style="margin-left:auto"
+                  onsubmit="return confirm('Permanently delete this product?')">
+              <button type="submit" class="btn btn-sm" style="color:var(--color-accent);border-color:var(--color-accent);background:transparent">
+                🗑 Delete Product
+              </button>
+            </form>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function previewImage(input) {
+  const preview = document.getElementById('imgPreview');
+  const img = document.getElementById('previewImg');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; preview.style.display = 'block'; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+function toggleDiscount(cb) {
+  document.getElementById('discountGroup').style.display = cb.checked ? '' : 'none';
+}
+</script>
+</body>
+</html>

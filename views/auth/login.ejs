@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — ShopZone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Inter', sans-serif; background: #f4f6f9; min-height: 100vh; }
+
+    .auth-shell {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Left panel ─────────────────────────────────── */
+    .auth-left {
+      background: linear-gradient(160deg, #0d0d0d 0%, #1a0505 60%, #2d0a0a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(230,57,70,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(230,57,70,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .auth-brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+      position: relative; z-index: 1;
+    }
+    .auth-brand span { color: #e63946; }
+
+    .auth-left-body {
+      position: relative; z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    .auth-left-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3vw, 2.6rem);
+      font-weight: 700;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .auth-left-desc {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 340px;
+    }
+    .auth-features { display: flex; flex-direction: column; gap: 16px; }
+    .auth-feature-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.9rem;
+    }
+    .auth-feature-check {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(230,57,70,0.2);
+      border: 1px solid rgba(230,57,70,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: #e63946;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .auth-left-footer {
+      position: relative; z-index: 1;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── Right panel ────────────────────────────────── */
+    .auth-right {
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      position: relative;
+    }
+
+    .auth-right-inner {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #6c757d;
+      text-decoration: none;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+    .auth-back-link:hover { color: #e63946; }
+
+    .auth-page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0d0d0d;
+      margin-bottom: 6px;
+    }
+    .auth-page-subtitle {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-bottom: 36px;
+    }
+
+    /* Form */
+    .form-field { margin-bottom: 20px; }
+    .form-field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .i-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 0.95rem; color: #9aa0a6; pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      outline: none;
+      background: #fafafa;
+      color: #1a1a1a;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .input-wrap input:focus {
+      border-color: #e63946;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(230,57,70,0.1);
+    }
+    .input-wrap input::placeholder { color: #bdc1c6; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit:hover {
+      background: #c1121f;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(230,57,70,0.35);
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 28px 0;
+      color: #bdc1c6; font-size: 0.82rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e8eaed;
+    }
+
+    .auth-switch-text {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #6c757d;
+    }
+    .auth-switch-text a {
+      color: #e63946;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .auth-switch-text a:hover { text-decoration: underline; }
+
+    .admin-hint {
+      margin-top: 24px;
+      padding: 14px 16px;
+      background: #f8f9fa;
+      border: 1px solid #e8eaed;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: #6c757d;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 768px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+      .auth-right {
+        min-height: 100vh;
+        padding: 40px 24px;
+        background: linear-gradient(160deg, #0d0d0d 0%, #1a0505 100%);
+      }
+      .auth-right-inner {
+        background: white;
+        border-radius: 20px;
+        padding: 36px 28px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      }
+      .auth-back-link { color: #6c757d; }
+    }
+    @media (max-width: 420px) {
+      .auth-right { padding: 24px 16px; }
+      .auth-right-inner { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+<%- include('../partials/flash') %>
+<script src="/js/main.js"></script>
+
+<div class="auth-shell">
+
+  <!-- ── Left visual panel ──────────────────────────── -->
+  <div class="auth-left">
+    <div class="auth-brand">Shop<span>Zone</span></div>
+
+    <div class="auth-left-body">
+      <h2 class="auth-left-title">Welcome Back to<br>ShopZone</h2>
+      <p class="auth-left-desc">Sign in to access your cart, orders, and exclusive deals curated just for you.</p>
+      <div class="auth-features">
+        <div class="auth-feature-item">
+          <div class="auth-feature-check">✓</div>
+          <span>Access your full order history</span>
+        </div>
+        <div class="auth-feature-item">
+          <div class="auth-feature-check">✓</div>
+          <span>Save items to your cart</span>
+        </div>
+        <div class="auth-feature-item">
+          <div class="auth-feature-check">✓</div>
+          <span>Exclusive member-only deals</span>
+        </div>
+        <div class="auth-feature-item">
+          <div class="auth-feature-check">✓</div>
+          <span>Fast, secure checkout</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-left-footer">© 2024 ShopZone. All rights reserved.</div>
+  </div>
+
+  <!-- ── Right form panel ──────────────────────────── -->
+  <div class="auth-right">
+    <div class="auth-right-inner">
+
+      <a href="/" class="auth-back-link">← Back to Home</a>
+
+      <h1 class="auth-page-title">Sign In</h1>
+      <p class="auth-page-subtitle">Enter your credentials to access your account.</p>
+
+      <form action="/login" method="POST">
+        <div class="form-field">
+          <label for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="i-icon">✉</span>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="i-icon">🔒</span>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign In →</button>
+      </form>
+
+      <div class="divider">or</div>
+
+      <div class="auth-switch-text">
+        Don't have an account? <a href="/register">Create one free →</a>
+      </div>
+
+      <div class="admin-hint">
+        <strong>Admin?</strong> Use your admin credentials to access the dashboard.
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
